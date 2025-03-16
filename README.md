@@ -1,9 +1,10 @@
 Minimal ARGF
 ============
 
-- ARGF like Ruby's
+- Ruby-like ARGF behavior
 - Compact code using [io.MultiReader](https://pkg.go.dev/io#MultiReader)
-- The number of open file handle is always ONE or ZERO
+- Always keeps exactly one file handle open, or none
+- Expands wildcards even on Windows
 - MIT License
 
 The code compatible with `bin/cat`
