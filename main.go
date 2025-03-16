@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 )
 
 type autoOpenFile struct {
@@ -33,9 +34,15 @@ func New(filenames []string) io.Reader {
 	if len(filenames) <= 0 {
 		return os.Stdin
 	}
-	f := make([]io.Reader, len(filenames))
-	for i, fname := range filenames {
-		f[i] = &autoOpenFile{Name: fname}
+	f := make([]io.Reader, 0, len(filenames))
+	for _, fname := range filenames {
+		if matches, err := filepath.Glob(fname); err == nil {
+			for _, m := range matches {
+				f = append(f, &autoOpenFile{Name: m})
+			}
+		} else {
+			f = append(f, &autoOpenFile{Name: fname})
+		}
 	}
 	return io.MultiReader(f...)
 }
