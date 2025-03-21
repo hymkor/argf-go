@@ -5,6 +5,7 @@ Minimal ARGF
 - Compact code using [io.MultiReader](https://pkg.go.dev/io#MultiReader)
 - Always keeps exactly one file handle open, or none
 - Expands wildcards even on Windows
+- Treats `-` as standard input
 - MIT License
 
 The code compatible with `bin/cat`
