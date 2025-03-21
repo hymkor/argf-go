@@ -9,15 +9,19 @@ import (
 
 type autoOpenFile struct {
 	Name string
-	fd   *os.File
+	fd   io.ReadCloser
 }
 
 func (f *autoOpenFile) Read(buffer []byte) (int, error) {
 	if f.fd == nil {
 		var err error
-		f.fd, err = os.Open(f.Name)
-		if err != nil {
-			return 0, fmt.Errorf("%s: %w", f.Name, err)
+		if f.Name == "-" {
+			f.fd = io.NopCloser(os.Stdin)
+		} else {
+			f.fd, err = os.Open(f.Name)
+			if err != nil {
+				return 0, fmt.Errorf("%s: %w", f.Name, err)
+			}
 		}
 	}
 	n, err := f.fd.Read(buffer)
@@ -36,7 +40,7 @@ func New(filenames []string) io.Reader {
 	}
 	f := make([]io.Reader, 0, len(filenames))
 	for _, fname := range filenames {
-		if matches, err := filepath.Glob(fname); err == nil {
+		if matches, err := filepath.Glob(fname); err == nil && len(matches) >= 1 {
 			for _, m := range matches {
 				f = append(f, &autoOpenFile{Name: m})
 			}
